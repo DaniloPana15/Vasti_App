@@ -111,7 +111,7 @@ const WHATSAPP_NUMBER = "549XXXXXXXXXX"; // ← Cambiá esto por tu número real
 // FUNCIÓN IA — Lista para conectar con Google Gemini 2.5 Flash
 // ============================================================
 
-/*
+
 // === INTEGRACIÓN REAL CON NANO BANANA API (Google Gemini 2.5 Flash Image) ===
 // 1. Andá a https://nano-banana.com y creá una cuenta
 // 2. Obtené tu API key
@@ -144,10 +144,10 @@ async function generateVastiTryOn(
   const data = await res.json();
   return data.result_url || data.image_url;
 }
-*/
+
 
 // === MOCK (funciona sin API key) ===
-async function generateVastiTryOn(
+/*async function generateVastiTryOn(
   _userPhotoFile: File,
   wigImageUrl: string,
   _wigName: string
@@ -157,7 +157,7 @@ async function generateVastiTryOn(
       resolve(wigImageUrl);
     }, 3000);
   });
-}
+}*/
 
 // ============================================================
 // COMPONENTE PRINCIPAL
