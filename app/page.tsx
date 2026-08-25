@@ -111,12 +111,12 @@ const WHATSAPP_NUMBER = "549XXXXXXXXXX"; // ← Cambiá esto por tu número real
 // FUNCIÓN IA — Lista para conectar con Google Gemini 2.5 Flash
 // ============================================================
 
-
+/*
 // === INTEGRACIÓN REAL CON NANO BANANA API (Google Gemini 2.5 Flash Image) ===
 // 1. Andá a https://nano-banana.com y creá una cuenta
 // 2. Obtené tu API key
-// 3. Agregala en un archivo .env.local: NEXT_PUBLIC_NANO_BANANA_API_KEY=tu_key
-// 4. Descomentá esta función y comentá el mock de abajo
+// 3. En Vercel → Settings → Environment Variables, agregá: NANO_BANANA_API_KEY (sin NEXT_PUBLIC_)
+// 4. Guardá y redeployá
 
 async function generateVastiTryOn(
   userPhotoFile: File,
@@ -129,25 +129,24 @@ async function generateVastiTryOn(
   formData.append("wig_name", wigName);
   formData.append("prompt", `Place this exact wig (${wigName}) on the person in the photo. Keep the face 100% identical. Photorealistic result.`);
 
-  const res = await fetch("https://api.nano-banana.com/v1/try-on", {
+  // Llamamos a nuestro propio endpoint del servidor (seguro, la API key no se expone)
+  const res = await fetch("/api/try-on", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NANO_BANANA_API_KEY}`,
-    },
     body: formData,
   });
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `Error ${res.status}`);
   }
 
   const data = await res.json();
   return data.result_url || data.image_url;
 }
-
+*/
 
 // === MOCK (funciona sin API key) ===
-/*async function generateVastiTryOn(
+async function generateVastiTryOn(
   _userPhotoFile: File,
   wigImageUrl: string,
   _wigName: string
@@ -157,7 +156,7 @@ async function generateVastiTryOn(
       resolve(wigImageUrl);
     }, 3000);
   });
-}*/
+}
 
 // ============================================================
 // COMPONENTE PRINCIPAL
@@ -233,7 +232,7 @@ export default function VastiApp() {
       .join("%0A");
     const total = `$${cartTotal.toLocaleString("es-AR")}`;
     const message = `¡Hola! 👋%0A%0AQuiero consultar sobre estas pelucas VASTI que agregué al carrito:%0A%0A${items}%0A%0A*Total: ${total}*%0A%0A¿Me podés ayudar con la compra? 💕`;
-    return `https://wa.me/${5491164175503}?text=${message}`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
   };
 
   // --- Upload ---
