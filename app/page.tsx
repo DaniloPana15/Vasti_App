@@ -233,7 +233,7 @@ export default function VastiApp() {
       .join("%0A");
     const total = `$${cartTotal.toLocaleString("es-AR")}`;
     const message = `¡Hola! 👋%0A%0AQuiero consultar sobre estas pelucas VASTI que agregué al carrito:%0A%0A${items}%0A%0A*Total: ${total}*%0A%0A¿Me podés ayudar con la compra? 💕`;
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+    return `https://wa.me/${5491126834921}?text=${message}`;
   };
 
   // --- Upload ---
