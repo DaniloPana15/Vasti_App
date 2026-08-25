@@ -40,12 +40,12 @@ interface CartItem {
 const products: Product[] = [
   {
     id: 1,
-    nombre: "VASTI - LLA",
+    nombre: "VASTI - LIA",
     color: "Rubia",
     largo: "Largo",
     estilo: "Ondas de Sirena",
     textura: "Lace Front",
-    imagen_url: "https://kimi-web-img.kimi.ai/img/www.everydaywigs.com/4d160a17cfb304d2e5e82765c3396a36b94d1986.jpg",
+    imagen_url: "https://imgur.com/LzWCusX.jpg",
     categoria: ["rubias", "largas", "premium"],
     precio: 320000,
     precio_str: "$320.000",
