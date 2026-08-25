@@ -45,7 +45,7 @@ const products: Product[] = [
     largo: "Largo",
     estilo: "Ondas de Sirena",
     textura: "Lace Front",
-    imagen_url: "https://imgur.com/LzWCusX",
+    imagen_url: "https://i.imgur.com/LzWCusX.jpeg",
     categoria: ["rubias", "largas", "premium"],
     precio: 320000,
     precio_str: "$320.000",
