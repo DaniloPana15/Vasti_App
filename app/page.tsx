@@ -45,7 +45,7 @@ const products: Product[] = [
     largo: "Largo",
     estilo: "Ondas de Sirena",
     textura: "Lace Front",
-    imagen_url: "https://imgur.com/LzWCusX.jpeg",
+    imagen_url: "https://i.imgur.com/LzWCusX.jpg",
     categoria: ["rubias", "largas", "premium"],
     precio: 320000,
     precio_str: "$320.000",
@@ -105,13 +105,13 @@ const filters = [
   { key: "premium", label: "Premium" },
 ];
 
-const WHATSAPP_NUMBER = "549XXXXXXXXXX"; // ← Cambiá esto por tu número real
+const WHATSAPP_NUMBER = "5491164175503"; // ← Cambiá esto por tu número real
 
 // ============================================================
 // FUNCIÓN IA — Lista para conectar con Google Gemini 2.5 Flash
 // ============================================================
 
-/*
+
 // === INTEGRACIÓN REAL CON NANO BANANA API (Google Gemini 2.5 Flash Image) ===
 // 1. Andá a https://nano-banana.com y creá una cuenta
 // 2. Obtené tu API key
@@ -142,8 +142,8 @@ async function generateVastiTryOn(
   const data = await res.json();
   return data.result_url;
 }
-*/
 
+/*
 // === MOCK (funciona sin API key) ===
 async function generateVastiTryOn(
   _userPhotoFile: File,
@@ -156,7 +156,7 @@ async function generateVastiTryOn(
     }, 3000);
   });
 }
-
+*/
 // ============================================================
 // COMPONENTE PRINCIPAL
 // ============================================================
