@@ -127,9 +127,8 @@ async function generateVastiTryOn(
   formData.append("image", userPhotoFile);
   formData.append("wig_url", wigImageUrl);
   formData.append("wig_name", wigName);
-  formData.append("prompt", `Place this exact wig (${wigName}) on the person in the photo. Keep the face 100% identical. Photorealistic result.`);
 
-  // Llamamos a nuestro propio endpoint del servidor (seguro, la API key no se expone)
+  // Llamamos a nuestro servidor (la API key está segura ahí)
   const res = await fetch("/api/try-on", {
     method: "POST",
     body: formData,
@@ -141,7 +140,7 @@ async function generateVastiTryOn(
   }
 
   const data = await res.json();
-  return data.result_url || data.image_url;
+  return data.result_url;
 }
 */
 
@@ -177,6 +176,7 @@ export default function VastiApp() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartAnimating, setCartAnimating] = useState(false);
+  const [tryOnError, setTryOnError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -257,13 +257,14 @@ export default function VastiApp() {
     if (!userPhotoFile || !selectedProduct) return;
     setTryOnStep("loading");
     setProgress(0);
+    setTryOnError(null);
 
     const interval = setInterval(() => {
       setProgress((p) => {
-        if (p >= 95) { clearInterval(interval); return 95; }
-        return p + Math.random() * 12 + 3;
+        if (p >= 90) { clearInterval(interval); return 90; }
+        return p + Math.random() * 8 + 2;
       });
-    }, 350);
+    }, 600);
 
     try {
       const result = await generateVastiTryOn(userPhotoFile, selectedProduct.imagen_url, selectedProduct.nombre);
@@ -271,10 +272,11 @@ export default function VastiApp() {
       setProgress(100);
       setResultImage(result);
       setTimeout(() => setTryOnStep("result"), 400);
-    } catch (err) {
+    } catch (err: any) {
       clearInterval(interval);
       console.error(err);
-      setResultImage(selectedProduct.imagen_url);
+      setTryOnError(err.message || "Error al generar la imagen. Intentá de nuevo.");
+      setResultImage(selectedProduct.imagen_url); // fallback
       setTimeout(() => setTryOnStep("result"), 400);
     }
   };
@@ -785,23 +787,27 @@ export default function VastiApp() {
                     <motion.div
                       animate={{ opacity: [1, 0.4, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="font-serif text-[36px] md:text-[42px] font-semibold tracking-[8px] mb-8 md:mb-10"
+                      className="font-serif text-[36px] md:text-[42px] font-semibold tracking-[8px] mb-6 md:mb-8"
                     >
                       VASTI
                     </motion.div>
+                    <div className="inline-flex items-center gap-2 bg-[#E8DDD0]/50 px-4 py-2 rounded-full mb-4">
+                      <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
+                      <span className="text-[11px] font-medium tracking-[1px] uppercase text-[#0A0A0A]">IA de Google Gemini activa</span>
+                    </div>
                     <p className="text-[14px] md:text-[16px] text-[#666] mb-6 md:mb-8 max-w-[400px] leading-[1.6] mx-auto">
-                      Colocándote tu {selectedProduct?.nombre}...<br />
-                      La magia de VASTI está trabajando
+                      Colocándote tu {selectedProduct?.nombre} con IA...<br />
+                      Esto puede tardar entre 5 y 15 segundos
                     </p>
                     <div className="w-[240px] md:w-[280px] h-[2px] bg-[#E8DDD0] rounded overflow-hidden mx-auto">
                       <motion.div className="h-full bg-[#0A0A0A]" style={{ width: `${progress}%` }} />
                     </div>
                     <p className="text-[11px] md:text-[12px] text-[#aaa] mt-4">
-                      {progress < 30 && "Analizando tu rostro..."}
-                      {progress >= 30 && progress < 50 && "Ajustando la base de la peluca..."}
-                      {progress >= 50 && progress < 70 && "Fusionando tonos y texturas..."}
-                      {progress >= 70 && progress < 90 && "Renderizando el resultado final..."}
-                      {progress >= 90 && "¡Listo! Preparando tu look VASTI..."}
+                      {progress < 25 && "Analizando tu rostro con IA..."}
+                      {progress >= 25 && progress < 50 && "Detectando línea del cabello..."}
+                      {progress >= 50 && progress < 75 && "Fusionando la peluca con tu foto..."}
+                      {progress >= 75 && progress < 90 && "Ajustando luces y sombras..."}
+                      {progress >= 90 && "Generando imagen final..."}
                     </p>
                   </motion.div>
                 )}
@@ -814,6 +820,18 @@ export default function VastiApp() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center w-full max-w-[900px] px-4 pb-8"
                   >
+                    {tryOnError && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-[13px]">
+                        <strong>⚠️ La IA no pudo procesar tu foto:</strong> {tryOnError}<br />
+                        <span className="text-[12px]">Se muestra la imagen de referencia de la peluca. Probá con otra foto (de frente, buena luz).</span>
+                      </div>
+                    )}
+                    {!tryOnError && (
+                      <div className="inline-flex items-center gap-2 bg-[#E8DDD0]/50 px-4 py-2 rounded-full mb-3">
+                        <Check size={14} className="text-[#25D366]" />
+                        <span className="text-[11px] font-medium tracking-[1px] uppercase text-[#0A0A0A]">Generado con IA de Google Gemini</span>
+                      </div>
+                    )}
                     <p className="text-[11px] tracking-[3px] uppercase text-[#C9A96E] mb-2 md:mb-3">Resultado VASTI</p>
                     <h2 className="font-serif text-[24px] md:text-[28px] font-medium mb-6 md:mb-8">
                       Así te queda {selectedProduct?.nombre}
