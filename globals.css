@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --vasti-black: #0A0A0A;
+    --vasti-offwhite: #F9F5F1;
+    --vasti-beige: #E8DDD0;
+    --vasti-gold: #C9A96E;
+    --vasti-dark: #1C1C1C;
+  }
+
+  body {
+    background-color: var(--vasti-offwhite);
+    color: var(--vasti-black);
+    font-family: var(--font-inter), 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), 'Playfair Display', serif;
+  }
+}
