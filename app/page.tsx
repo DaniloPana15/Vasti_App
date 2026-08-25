@@ -59,7 +59,7 @@ const products: Product[] = [
     largo: "Corto",
     estilo: "Bob con Mechas",
     textura: "Fibra Premium",
-    imagen_url: "https://imgur.com/UUiJlfs.jpeg",
+    imagen_url: "https://i.imgur.com/bcTwv9j.jpeg",
     categoria: ["rubias", "cortas"],
     precio: 245000,
     precio_str: "$245.000",
