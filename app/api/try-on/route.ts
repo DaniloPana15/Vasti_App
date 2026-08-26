@@ -36,8 +36,17 @@ export async function POST(req: NextRequest) {
     const wigBase64 = wigBuffer.toString("base64");
     const wigMimeType = wigResponse.headers.get("content-type") || "image/jpeg";
 
-    // 3. Construir el payload para Gemini
-    const prompt = `You are a professional hair stylist AI. Take the person from IMAGE 1 (keep face, skin tone, expression, background 100% identical) and make them wear the wig/hair from IMAGE 2. Realistic hairline, natural shadows, photorealistic, 8k, e-commerce photo. Wig name is ${wigName}. Only change the hair.`;
+    // 3. Construir el payload para Gemini con el prompt optimizado
+    const prompt = `Task: Virtual wig try-on.
+IMAGE 1 is the USER - you must preserve this person 100%: same face, same facial features, same skin tone, same eyes, same eyebrows, same makeup, same expression, same background, same lighting, same clothes.
+IMAGE 2 is the WIG REFERENCE - extract ONLY the hair/wig style, color, texture, and bangs from this image.
+Generate a new photorealistic image of the person from IMAGE 1 wearing the wig from IMAGE 2.
+- Keep identity identical, do not change face shape.
+- Create a natural, realistic hairline.
+- The hair should have realistic shadows on forehead and neck.
+- High quality, 8k, studio lighting, e-commerce style.
+- Only the hair changes, everything else stays identical.
+- Wig name for context: ${wigName}`;
 
     const payload = {
       contents: [
@@ -54,9 +63,8 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    // NOTA: "gemini-2.0-flash-exp" es el modelo público real actual que soporta generación de imágenes. 
-    // Si tu clave tiene acceso específico a "gemini-2.5-flash-image-preview", cambiá el string aquí abajo.
-    const modelName = "gemini-2.0-flash-exp"; 
+    // Usar el modelo correcto: gemini-2.5-flash-image-preview
+    const modelName = "gemini-2.5-flash-image-preview";
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     const res = await fetch(geminiUrl, {
@@ -83,12 +91,11 @@ export async function POST(req: NextRequest) {
     let mimeType = "image/png";
 
     if (data.candidates && data.candidates[0]?.content?.parts) {
-      for (const part of data.candidates[0].content.parts) {
-        if (part.inlineData) {
-          resultBase64 = part.inlineData.data;
-          mimeType = part.inlineData.mimeType || "image/png";
-          break;
-        }
+      const parts = data.candidates[0].content.parts;
+      const imageData = parts.find((p: any) => p.inlineData);
+      if (imageData && imageData.inlineData) {
+        resultBase64 = imageData.inlineData.data;
+        mimeType = imageData.inlineData.mimeType || "image/png";
       }
     }
 
