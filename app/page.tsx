@@ -129,7 +129,7 @@ async function generateVastiTryOn(
   }
 
   const data = await res.json();
-  return data.result_url;
+  return data.result_url; // Ya viene en formato base64 data URL listo para usar
 }
 
 // ============================================================
