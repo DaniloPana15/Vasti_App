@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
     // Prompt optimizado
     const prompt = `You are a professional hair stylist AI. Take the person from IMAGE 1 (keep face, skin tone, expression, background 100% identical) and make them wear the wig/hair from IMAGE 2. Realistic hairline, natural shadows, photorealistic, 8k, e-commerce photo. Wig name is ${wigName || "VASTI"}. Only change the hair.`;
 
-    // Llamada REAL a Google Gemini
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+    // Llamada REAL a Google Gemini — modelo CORREGIDO (sin -preview)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`;
 
     const geminiRes = await fetch(geminiUrl, {
       method: "POST",
