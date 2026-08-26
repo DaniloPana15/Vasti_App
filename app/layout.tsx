@@ -16,7 +16,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "VASTI — Probador Virtual de Pelucas con IA",
-  description: "Encontrá tu peluca VASTI ideal en 3 segundos. Probá nuestra colección con Inteligencia Artificial sin moverte de tu casa.",
+  description: "Encontrá tu peluca ideal en 3 segundos. Probá nuestra colección con Inteligencia Artificial sin moverte de tu casa.",
 };
 
 export default function RootLayout({
