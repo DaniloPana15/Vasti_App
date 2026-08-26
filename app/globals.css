@@ -4,22 +4,50 @@
 
 @layer base {
   :root {
-    --vasti-black: #0A0A0A;
-    --vasti-offwhite: #F9F5F1;
-    --vasti-beige: #E8DDD0;
+    --vasti-black: #0a0a0f;
+    --vasti-offwhite: #f0f0f5;
+    --vasti-beige: #C9A96E;
     --vasti-gold: #C9A96E;
-    --vasti-dark: #1C1C1C;
+    --vasti-dark: #12121a;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
-    background-color: var(--vasti-offwhite);
-    color: var(--vasti-black);
+    background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #1a1a2e 100%);
+    background-attachment: fixed;
+    color: #f0f0f5;
     font-family: var(--font-inter), 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-playfair), 'Playfair Display', serif;
+  }
+
+  ::selection {
+    background: #C9A96E;
+    color: #0a0a0f;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0f;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C9A96E;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d4b896;
   }
 }
