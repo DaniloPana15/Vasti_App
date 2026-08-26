@@ -440,13 +440,13 @@ export default function VastiApp() {
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="font-serif text-[clamp(36px,6vw,64px)] font-medium leading-[1.05] mb-6 bg-gradient-to-r from-white via-[#f0e6d8] to-[#C9A96E] bg-clip-text text-transparent"
         >
-          Encontrá tu VASTI<br />ideal en 3 segundos
+          Encontrá tu Peluca VASTI<br />ideal en 3 segundos
         </motion.h1>
 
         <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="text-[16px] md:text-[18px] font-light text-white/40 leading-[1.7] mb-12 max-w-[560px] mx-auto"
         >
-          Probate toda nuestra colección con Inteligencia Artificial sin moverte de tu casa
+          Descubre cómo te queda cada estilo con nuestro probador virtual, sin salir de casa.
         </motion.p>
 
         <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
