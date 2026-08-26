@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     
     if (!hfApiKey) {
       return NextResponse.json(
-        { error: "Falta HUGGINGFACE_API_KEY. Creá cuenta en huggingface.co" },
+        { error: "Falta HUGGINGFACE_API_KEY en Vercel" },
         { status: 500 }
       );
     }
@@ -23,54 +23,51 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Descargar peluca
+    // 1. Descargar la peluca (para usarla como referencia visual en el prompt)
     const wigResponse = await fetch(wigUrl);
-    const wigBuffer = Buffer.from(await wigResponse.arrayBuffer());
-    
-    // Convertir usuario a base64
+    if (!wigResponse.ok) {
+      throw new Error(`No se pudo descargar la peluca: ${wigResponse.status}`);
+    }
+
+    // 2. Obtener los bytes de la foto del usuario
     const userBuffer = Buffer.from(await imageFile.arrayBuffer());
-    const userBase64 = userBuffer.toString("base64");
 
-    // Prompt para cambiar pelo
-    const prompt = `Professional photo of person wearing ${wigName} wig, photorealistic, natural hairline, keep face identical`;
+    // 3. Prompt específico para virtual try-on
+    const prompt = `Change the person's hair to match a ${wigName} wig style. Keep the face, skin, expression, and background 100% identical. Only change the hair.`;
 
-    // Usar InstructPix2Pix (mejor para editar imágenes)
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${hfApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          inputs: {
-            image: userBase64,
-            prompt: prompt,
-          }
-        }),
-      }
-    );
+    // 4. Llamar a Hugging Face con el formato CORRECTO
+    // instruct-pix2pix espera: imagen como bytes + prompt como query param
+    const hfUrl = `https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix?prompt=${encodeURIComponent(prompt)}`;
+    
+    const response = await fetch(hfUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${hfApiKey}`,
+        "X-Wait-For-Model": "true", // ⚠️ CLAVE: espera a que el modelo cargue
+        "Content-Type": imageFile.type || "image/jpeg",
+      },
+      body: userBuffer, // ️ La imagen va como bytes, NO como JSON
+    });
 
+    // 5. Manejar respuesta
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Hugging Face error:", error);
+      const errorText = await response.text();
+      console.error("Hugging Face error:", response.status, errorText);
       
-      // Si el modelo está cargando, esperar
       if (response.status === 503) {
         return NextResponse.json(
-          { error: "El modelo está cargando. Esperá 30 segundos y probá de nuevo." },
+          { error: "El modelo está cargando (30-60 seg). Esperá y probá de nuevo." },
           { status: 503 }
         );
       }
       
       return NextResponse.json(
-        { error: `Error IA: ${response.status}` },
+        { error: `Error IA (${response.status}): ${errorText}` },
         { status: response.status }
       );
     }
 
-    // Hugging Face devuelve la imagen directamente
+    // 6. La respuesta viene como imagen directa (bytes)
     const imageBlob = await response.blob();
     const arrayBuffer = await imageBlob.arrayBuffer();
     const base64Image = Buffer.from(arrayBuffer).toString("base64");
@@ -81,9 +78,9 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (err: any) {
-    console.error("Error:", err);
+    console.error("Server error:", err);
     return NextResponse.json(
-      { error: err.message || "Error interno" },
+      { error: err.message || "Error de conexión con la IA" },
       { status: 500 }
     );
   }
