@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.NANO_BANANA_API_KEY;
+    const apiKey = process.env.REPLICATE_API_TOKEN;
+    
     if (!apiKey) {
       return NextResponse.json(
-        { error: "API key no configurada. Andá a Vercel → Settings → Environment Variables y agregá NANO_BANANA_API_KEY." },
+        { error: "Falta REPLICATE_API_TOKEN. Configurá en Vercel → Settings → Environment Variables" },
         { status: 500 }
       );
     }
@@ -22,94 +23,99 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Convertir la foto del usuario a Base64
-    const userImageBuffer = Buffer.from(await imageFile.arrayBuffer());
-    const userImageBase64 = userImageBuffer.toString("base64");
-    const userImageMimeType = imageFile.type || "image/jpeg";
-
-    // 2. Descargar la imagen de la peluca a Buffer
+    // 1. Descargar la imagen de la peluca
     const wigResponse = await fetch(wigUrl);
     if (!wigResponse.ok) {
-      throw new Error(`No se pudo descargar la imagen de la peluca: ${wigResponse.status}`);
+      throw new Error(`No se pudo descargar la peluca: ${wigResponse.status}`);
     }
     const wigBuffer = Buffer.from(await wigResponse.arrayBuffer());
     const wigBase64 = wigBuffer.toString("base64");
-    const wigMimeType = wigResponse.headers.get("content-type") || "image/jpeg";
 
-    // 3. Construir el payload para Gemini con el prompt optimizado
-    const prompt = `Task: Virtual wig try-on.
-IMAGE 1 is the USER - you must preserve this person 100%: same face, same facial features, same skin tone, same eyes, same eyebrows, same makeup, same expression, same background, same lighting, same clothes.
-IMAGE 2 is the WIG REFERENCE - extract ONLY the hair/wig style, color, texture, and bangs from this image.
-Generate a new photorealistic image of the person from IMAGE 1 wearing the wig from IMAGE 2.
-- Keep identity identical, do not change face shape.
-- Create a natural, realistic hairline.
-- The hair should have realistic shadows on forehead and neck.
-- High quality, 8k, studio lighting, e-commerce style.
-- Only the hair changes, everything else stays identical.
-- Wig name for context: ${wigName}`;
+    // 2. Convertir foto del usuario a base64
+    const userBuffer = Buffer.from(await imageFile.arrayBuffer());
+    const userBase64 = userBuffer.toString("base64");
 
-    const payload = {
-      contents: [
-        {
-          parts: [
-            { text: prompt },
-            { inlineData: { mimeType: userImageMimeType, data: userImageBase64 } },
-            { inlineData: { mimeType: wigMimeType, data: wigBase64 } }
-          ]
-        }
-      ],
-      generationConfig: {
-        responseModalities: ["IMAGE"]
-      }
-    };
+    // 3. Crear prompt específico para virtual try-on
+    const prompt = `Professional photo of a person wearing a ${wigName} wig. Photorealistic, high quality, natural hairline, studio lighting, e-commerce photo. Keep the person's face 100% identical.`;
 
-    // Usar el modelo correcto: gemini-2.5-flash-image-preview
-    const modelName = "gemini-2.5-flash-image-preview";
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-    const res = await fetch(geminiUrl, {
+    // 4. Llamar a Replicate API (SDXL con img2img)
+    const createPrediction = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
       headers: {
+        "Authorization": `Token ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", // SDXL v1.0
+        input: {
+          image: `data:image/jpeg;base64,${userBase64}`,
+          prompt: prompt,
+          prompt_strength: 0.75, // Cuanto más alto, más cambia la imagen
+          num_inference_steps: 50, // Calidad (más = mejor pero más lento)
+          guidance_scale: 7.5, // Qué tanto sigue el prompt
+          image_dimensions: "512x512",
+          num_outputs: 1
+        }
+      })
     });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Gemini API error:", res.status, errorText);
+    if (!createPrediction.ok) {
+      const error = await createPrediction.text();
+      console.error("Replicate create error:", error);
       return NextResponse.json(
-        { error: `Error de la IA (${res.status}): ${errorText}` },
-        { status: res.status }
+        { error: `Error al crear predicción: ${createPrediction.status}` },
+        { status: createPrediction.status }
       );
     }
 
-    const data = await res.json();
+    const prediction = await createPrediction.json();
+    console.log("Prediction created:", prediction.id);
 
-    // 4. Extraer la imagen generada de la respuesta de Gemini
-    let resultBase64 = "";
-    let mimeType = "image/png";
+    // 5. Esperar a que termine (polling)
+    let result;
+    let attempts = 0;
+    const maxAttempts = 30; // 30 * 2s = 60 segundos máximo
 
-    if (data.candidates && data.candidates[0]?.content?.parts) {
-      const parts = data.candidates[0].content.parts;
-      const imageData = parts.find((p: any) => p.inlineData);
-      if (imageData && imageData.inlineData) {
-        resultBase64 = imageData.inlineData.data;
-        mimeType = imageData.inlineData.mimeType || "image/png";
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Esperar 2s
+
+      const statusResponse = await fetch(
+        `https://api.replicate.com/v1/predictions/${prediction.id}`,
+        {
+          headers: { "Authorization": `Token ${apiKey}` }
+        }
+      );
+
+      if (!statusResponse.ok) {
+        throw new Error(`Error checking status: ${statusResponse.status}`);
       }
+
+      result = await statusResponse.json();
+      console.log(`Attempt ${attempts + 1}: Status = ${result.status}`);
+
+      if (result.status === "succeeded") {
+        break;
+      }
+
+      if (result.status === "failed" || result.status === "canceled") {
+        throw new Error(`Generación fallida: ${result.error || "Error desconocido"}`);
+      }
+
+      attempts++;
     }
 
-    if (!resultBase64) {
-      console.error("Gemini response without image:", JSON.stringify(data));
-      return NextResponse.json(
-        { error: "La IA no devolvió una imagen. Respuesta: " + JSON.stringify(data) },
-        { status: 500 }
-      );
+    if (!result || !result.output) {
+      throw new Error("Timeout: la generación tardó demasiado");
     }
 
-    // Devolver como Data URL para que Next.js Image lo renderice directamente
-    const resultUrl = `data:${mimeType};base64,${resultBase64}`;
-    return NextResponse.json({ result_url: resultUrl });
+    // 6. Devolver la URL de la imagen generada
+    const imageUrl = Array.isArray(result.output) ? result.output[0] : result.output;
+    
+    console.log("Image generated successfully:", imageUrl);
+    
+    return NextResponse.json({ 
+      result_url: imageUrl 
+    });
 
   } catch (err: any) {
     console.error("Server error:", err);
