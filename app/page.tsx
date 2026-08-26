@@ -733,6 +733,7 @@ export default function VastiApp() {
 // ============================================================
 // COMPONENTE: COMPARE SLIDER
 // ============================================================
+
 function CompareSlider({ beforeImage, afterImage }: { beforeImage: string; afterImage: string }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -749,10 +750,12 @@ function CompareSlider({ beforeImage, afterImage }: { beforeImage: string; after
     const onMouseMove = (e: MouseEvent) => isDragging && handleMove(e.clientX);
     const onTouchMove = (e: TouchEvent) => isDragging && handleMove(e.touches[0].clientX);
     const onUp = () => setIsDragging(false);
+
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("touchmove", onTouchMove);
     window.addEventListener("mouseup", onUp);
     window.addEventListener("touchend", onUp);
+
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
@@ -763,17 +766,27 @@ function CompareSlider({ beforeImage, afterImage }: { beforeImage: string; after
 
   return (
     <div className="max-w-[400px] md:max-w-[500px] mx-auto">
-      <div ref={containerRef}
+      <div
+        ref={containerRef}
         className="relative rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(201,169,110,0.15)] aspect-square cursor-ew-resize select-none ring-1 ring-white/10"
         onClick={(e) => handleMove(e.clientX)}
       >
+        {/* AFTER IMAGE (con la peluca - resultado de la IA) */}
         <div className="absolute inset-0">
           <Image src={afterImage} alt="Con VASTI" fill className="object-cover" />
         </div>
-        <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
+        
+        {/* BEFORE IMAGE (foto original del usuario) */}
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+        >
           <Image src={beforeImage} alt="Tu foto" fill className="object-cover" />
         </div>
-        <div className="absolute top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#C9A96E] to-[#d4a5a5] cursor-ew-resize z-10 shadow-[0_0_20px_rgba(201,169,110,0.5)]"
+
+        {/* Slider handle */}
+        <div
+          className="absolute top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#C9A96E] to-[#d4a5a5] cursor-ew-resize z-10 shadow-[0_0_20px_rgba(201,169,110,0.5)]"
           style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
           onMouseDown={() => setIsDragging(true)}
           onTouchStart={() => setIsDragging(true)}
