@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VASTI — Probador Virtual de Pelucas con IA</title>
+  
+  <!-- Tipografías de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Luces / Degradados de fondo -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="#" class="logo">VASTI</a>
+    <nav class="nav-desktop">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#catalogo">Colecciones</a>
+      <a href="#catalogo">Probador IA</a>
+      <button class="btn-cart" id="open-cart-btn">
+        <i data-lucide="shopping-bag"></i>
+        Carrito (<span id="cart-count">0</span>)
+      </button>
+    </nav>
+    <div class="mobile-actions">
+      <button class="btn-icon" id="open-cart-mobile">
+        <i data-lucide="shopping-bag"></i>
+        <span class="badge" id="cart-count-badge">0</span>
+      </button>
+      <button class="btn-icon" id="open-menu-mobile">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MENÚ MÓVIL OVERLAY -->
+  <div class="mobile-menu-overlay" id="mobile-menu">
+    <div class="mobile-menu-content">
+      <div class="mobile-menu-header">
+        <span class="logo">VASTI</span>
+        <button class="btn-close" id="close-menu-mobile"><i data-lucide="x"></i></button>
+      </div>
+      <nav class="mobile-menu-nav">
+        <a href="#catalogo" class="mobile-link">Catálogo <i data-lucide="chevron-right"></i></a>
+        <a href="#catalogo" class="mobile-link">Colecciones <i data-lucide="chevron-right"></i></a>
+        <a href="#catalogo" class="mobile-link">Probador IA <i data-lucide="chevron-right"></i></a>
+        <hr />
+        <button class="mobile-link" id="cart-mobile-link">
+          <span><i data-lucide="shopping-bag"></i> Mi Carrito</span>
+          <span class="badge" id="cart-count-mobile-badge">0</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- CARRITO OVERLAY -->
+  <div class="cart-overlay" id="cart-overlay">
+    <div class="cart-sidebar">
+      <div class="cart-header">
+        <div>
+          <h2>Tu Carrito</h2>
+          <p id="cart-subtitle">0 productos</p>
+        </div>
+        <button class="btn-close" id="close-cart-btn"><i data-lucide="x"></i></button>
+      </div>
+      
+      <div class="cart-body" id="cart-body">
+        <!-- Generado dinámicamente con JS -->
+      </div>
+
+      <div class="cart-footer" id="cart-footer" style="display: none;">
+        <div class="cart-total">
+          <span>Subtotal</span>
+          <span id="cart-total-price">$0</span>
+        </div>
+        <a href="#" target="_blank" id="whatsapp-btn" class="btn-whatsapp">
+          <i data-lucide="message-circle"></i> Consultar por WhatsApp
+        </a>
+        <button id="clear-cart-btn" class="btn-clear-cart">Vaciar carrito</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">
+      <i data-lucide="zap"></i>
+      <span>El Probador Virtual de VASTI</span>
+    </div>
+    <h1>Encontrá tu Peluca VASTI<br />ideal en 3 segundos</h1>
+    <p>Descubre cómo te queda cada estilo con nuestro probador virtual, sin salir de casa.</p>
+    <a href="#catalogo" class="btn-primary">
+      <i data-lucide="sparkles"></i> Empezar a probarme
+    </a>
+  </section>
+
+  <!-- FILTROS -->
+  <div class="filters-container" id="catalogo">
+    <button class="filter-btn active" data-filter="todas">Todas</button>
+    <button class="filter-btn" data-filter="rubias">Rubias</button>
+    <button class="filter-btn" data-filter="morenas">Morenas</button>
+    <button class="filter-btn" data-filter="largas">Largas</button>
+    <button class="filter-btn" data-filter="cortas">Cortas</button>
+    <button class="filter-btn" data-filter="premium">Premium</button>
+  </div>
+
+  <!-- PRODUCT GRID -->
+  <section class="products-grid" id="products-grid">
+    <!-- Generado dinámicamente desde JavaScript -->
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p class="footer-logo">VASTI</p>
+    <p>© 2026 — Todos los derechos reservados</p>
+  </footer>
+
+  <!-- MODAL DETALLE DE PRODUCTO -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="close-modal-btn"><i data-lucide="x"></i></button>
+      <div class="modal-image">
+        <img id="modal-img" src="" alt="Producto" />
+      </div>
+      <div class="modal-info">
+        <h2 id="modal-title"></h2>
+        <p id="modal-desc" class="modal-desc"></p>
+        
+        <div class="modal-specs">
+          <div class="spec-box">
+            <span>Color</span>
+            <strong id="modal-color"></strong>
+          </div>
+          <div class="spec-box">
+            <span>Largo</span>
+            <strong id="modal-largo"></strong>
+          </div>
+          <div class="spec-box">
+            <span>Textura</span>
+            <strong id="modal-textura"></strong>
+          </div>
+        </div>
+
+        <p id="modal-price" class="modal-price"></p>
+
+        <button class="btn-primary full-width" id="modal-start-tryon">
+          <i data-lucide="sparkles"></i> Probarme esta VASTI
+        </button>
+        <button class="btn-secondary full-width" id="modal-add-cart">
+          <i data-lucide="shopping-cart"></i> Agregar al Carrito
+        </button>
+        <p class="modal-footer-note">Probador con IA de VASTI — 100% privado</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PROBADOR IA (PASO A PASO) -->
+  <div class="tryon-overlay" id="tryon-overlay">
+    <div class="tryon-header">
+      <span class="logo">VASTI</span>
+      <button class="btn-close" id="close-tryon-btn"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- PASO 1: UPLOAD -->
+    <div class="tryon-step" id="tryon-step-upload">
+      <div class="hero-tag">
+        <i data-lucide="sparkles"></i>
+        <span>Probador Virtual VASTI</span>
+      </div>
+      <h2>Subí tu foto para probarte la <span id="tryon-wig-name" class="highlight"></span></h2>
+      <p class="subtitle">Tu foto no se guarda. Es 100% privada.</p>
+
+      <div class="upload-box" id="drop-zone">
+        <i data-lucide="upload" class="upload-icon"></i>
+        <h3>Arrastrá tu foto aquí</h3>
+        <p>o tocá para seleccionar</p>
+        <small>De frente, con buena luz, pelo recogido si podés.<br />JPG, PNG · Máx. 10MB</small>
+        <input type="file" id="file-input" accept="image/*" hidden />
+      </div>
+
+      <div class="preview-box" id="photo-preview-box" style="display: none;">
+        <img id="user-photo-img" src="" alt="Tu Foto" />
+      </div>
+
+      <div class="consent-box">
+        <input type="checkbox" id="consent-check" />
+        <label for="consent-check">Acepto el uso temporal de mi imagen para la prueba virtual de VASTI. Mi foto será procesada por IA y no será almacenada.</label>
+      </div>
+
+      <button class="btn-primary" id="btn-start-process" disabled>Probar esta VASTI</button>
+    </div>
+
+    <!-- PASO 2: LOADING -->
+    <div class="tryon-step" id="tryon-step-loading" style="display: none;">
+      <h1 class="logo-anim">VASTI</h1>
+      <div class="badge-active">
+        <span class="dot"></span>
+        <span>IA de VASTI activa</span>
+      </div>
+      <p class="loading-desc">Colocándote tu peluca con IA...<br />Esto puede tardar unos segundos.</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p id="progress-text" class="progress-text">Analizando rostro...</p>
+    </div>
+
+    <!-- PASO 3: RESULTADO -->
+    <div class="tryon-step" id="tryon-step-result" style="display: none;">
+      <div class="badge-active">
+        <i data-lucide="check"></i>
+        <span>Generado con IA</span>
+      </div>
+      <p class="section-tag">Resultado VASTI</p>
+      <h2>Así te queda <span id="result-wig-name" class="highlight"></span></h2>
+
+      <!-- Compare Slider -->
+      <div class="slider-container" id="slider-container">
+        <img id="slider-after" class="img-after" src="" alt="Resultado" />
+        <div class="img-before-wrapper" id="slider-before-wrapper">
+          <img id="slider-before" class="img-before" src="" alt="Antes" />
+        </div>
+        <div class="slider-handle" id="slider-handle">
+          <div class="handle-button">◀ ▶</div>
+        </div>
+      </div>
+      <div class="slider-labels">
+        <span>Tu foto</span>
+        <span>Con VASTI</span>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-result-add-cart"><i data-lucide="shopping-cart"></i> Al Carrito</button>
+        <button class="btn-secondary" id="btn-result-retry"><i data-lucide="rotate-ccw"></i> Otra VASTI</button>
+      </div>
+
+      <div class="buy-section">
+        <p>¿Te gustó? Comprá esta VASTI ahora</p>
+        <h3 id="result-price"></h3>
+        <button class="btn-primary" id="btn-buy-now">Comprar Ahora</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
