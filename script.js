@@ -2,7 +2,7 @@
 // BASE DE DATOS DE PRODUCTOS VASTI
 // ============================================================
 const products = [
-  {
+  { 
     id: 1,
     nombre: "VASTI - LIA",
     color: "Rubia",
